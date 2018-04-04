@@ -1,9 +1,13 @@
 package com.example.demo;
 
 import org.springframework.stereotype.Repository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Data Access Object - provide some specific data operations without exposing details of the database
@@ -25,7 +29,16 @@ public class GreetingDao {
     //Insert greeting into the database.
     public void create(Greeting greeting) {
         entityManager.persist(greeting);
-        return;
+    }
+
+    public String update(Greeting g) {
+        String to_return = "Greeting successfully updated";
+        try {
+            entityManager.merge(g);
+        } catch (IllegalArgumentException e) {
+            to_return = e.toString();
+        }
+        return to_return;
     }
 
     //Return the greeting with the passed-in id.
@@ -33,55 +46,20 @@ public class GreetingDao {
         return entityManager.find(Greeting.class, id);
     }
 
-    /**
-     * Delete the user from the database.
-     */
-    /*
-    public void delete(Greeting greeting) {
-        if (entityManager.contains(greeting))
-            entityManager.remove(greeting);
-        else
-            entityManager.remove(entityManager.merge(greeting));
-        return;
-    }
-    */
 
-    /**
-     * Return all the users stored in the database.
-     */
-    /*
+    public Greeting delete(int id) {
+        Greeting g = getById(id);
+        if (g.getId() > 0) {
+            entityManager.remove(g);
+        } else
+            entityManager.remove(entityManager.merge(g));
+        return g;
+    }
+
     @SuppressWarnings("unchecked")
     public List<Greeting> getAll() {
         return entityManager.createQuery("from User").getResultList();
     }
-    */
-
-
-    /**
-     * Return the user having the passed email.
-     */
-    /*
-    public Greeting getByEmail(String email) {
-        return (Greeting) entityManager.createQuery(
-                "from User where email = :email")
-                .setParameter("email", email)
-                .getSingleResult();
-    }
-    */
-
-    /**
-     * Update the passed user in the database.
-     */
-    /*
-    public void update(Greeting student) {
-        entityManager.merge(student);
-        return;
-    }
-    */
-
-    // ------------------------
-    // PRIVATE FIELDS
-    // ------------------------
 
 
 } // class UserDao
